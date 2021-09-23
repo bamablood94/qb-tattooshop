@@ -3,7 +3,7 @@ QBCore.Functions.CreateCallback('SmallTattoos:GetPlayerTattoos', function(source
     local Player = QBCore.Functions.GetPlayer(src)
 
 	if Player then
-		local result = exports.ghmattimysql:executeSync('SELECT tattoos FROM players WHERE citizenid = @citizenid', {['@citizenid'] = Player.PlayerData.citizenid})
+		local result = exports.oxmysql:executeSync('SELECT tattoos FROM players WHERE citizenid = @citizenid', {['@citizenid'] = Player.PlayerData.citizenid})
 		if result[1].tattoos then
 			cb(json.decode(result[1].tattoos))
 		else
@@ -22,7 +22,7 @@ QBCore.Functions.CreateCallback('SmallTattoos:PurchaseTattoo', function(source, 
 		Player.Functions.RemoveMoney('cash', price)
 		table.insert(tattooList, tattoo)
 
-		exports['ghmattimysql']:execute('UPDATE players SET tattoos = @tattoos WHERE citizenid = @citizenid', {
+		exports.oxmysql:execute('UPDATE players SET tattoos = @tattoos WHERE citizenid = @citizenid', {
 			['@tattoos'] = json.encode(tattooList),
 			['@citizenid'] = Player.PlayerData.citizenid
 		})
@@ -40,7 +40,7 @@ AddEventHandler('SmallTattoos:RemoveTattoo', function (tattooList)
 	local src = source
     local Player = QBCore.Functions.GetPlayer(src)
 
-	exports['ghmattimysql']:execute('UPDATE players SET tattoos = @tattoos WHERE citizenid = @citizenid', {
+	exports.oxmysql:execute('UPDATE players SET tattoos = @tattoos WHERE citizenid = @citizenid', {
         ['@tattoos'] = json.encode(tattooList),
         ['@citizenid'] = Player.PlayerData.citizenid
     })
