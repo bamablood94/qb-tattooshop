@@ -5,6 +5,7 @@ local opacity = 1
 local scaleType = nil
 local scaleString = ""
 local isLoggedIn = false
+local QBCore = exports['qb-core']:GetCoreObject()
 
 Citizen.CreateThread(function()
 	AddTextEntry("ParaTattoos", "Tattoo Shop")

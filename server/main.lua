@@ -1,14 +1,17 @@
+local QBCore = exports['qb-core']:GetCoreObject()
+
 QBCore.Functions.CreateCallback('SmallTattoos:GetPlayerTattoos', function(source, cb)
 	local src = source
     local Player = QBCore.Functions.GetPlayer(src)
 
 	if Player then
-		local result = exports.oxmysql:executeSync('SELECT tattoos FROM players WHERE citizenid = @citizenid', {['@citizenid'] = Player.PlayerData.citizenid})
-		if result[1].tattoos then
-			cb(json.decode(result[1].tattoos))
-		else
-			cb()
-		end
+		exports.oxmysql:execute('SELECT tattoos FROM players WHERE citizenid = ?', { Player.PlayerData.citizenid }, function(result)
+			if result[1].tattoos then
+				cb(json.decode(result[1].tattoos))
+			else
+				cb()
+			end
+		end)
 	else
 		cb()
 	end
@@ -22,10 +25,7 @@ QBCore.Functions.CreateCallback('SmallTattoos:PurchaseTattoo', function(source, 
 		Player.Functions.RemoveMoney('cash', price)
 		table.insert(tattooList, tattoo)
 
-		exports.oxmysql:execute('UPDATE players SET tattoos = @tattoos WHERE citizenid = @citizenid', {
-			['@tattoos'] = json.encode(tattooList),
-			['@citizenid'] = Player.PlayerData.citizenid
-		})
+		exports.oxmysql:update('UPDATE players SET tattoos = ? WHERE citizenid = ?', { json.encode(tattooList), Player.PlayerData.citizenid })
 
 		TriggerClientEvent('QBCore:Notify', src, "You have bought the ~y~" .. tattooName .. "~s~ tattoo for ~g~$" .. price, "success", 4000)
 		cb(true)
@@ -40,8 +40,5 @@ AddEventHandler('SmallTattoos:RemoveTattoo', function (tattooList)
 	local src = source
     local Player = QBCore.Functions.GetPlayer(src)
 
-	exports.oxmysql:execute('UPDATE players SET tattoos = @tattoos WHERE citizenid = @citizenid', {
-        ['@tattoos'] = json.encode(tattooList),
-        ['@citizenid'] = Player.PlayerData.citizenid
-    })
+	exports.oxmysql:update('UPDATE players SET tattoos = ? WHERE citizenid = ?', { json.encode(tattooList), Player.PlayerData.citizenid })
 end)
